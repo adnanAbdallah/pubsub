@@ -1,0 +1,76 @@
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+
+
+
+public class Subscriber implements MqttCallback {
+	
+
+	
+//	The broker url. 
+	private static final    String brokerUrl = "tcp://broker.emqx.io:1883";
+//	 The client id. 
+	private static final String clientId = "clientId12344321";
+	
+	
+//the function of subscribe
+	public void subscribe_function(String topic) {
+		//	logger file name and pattern to log
+		MemoryPersistence persistence = new MemoryPersistence();
+		try
+		{
+			MqttClient sampleClient = new MqttClient(brokerUrl, clientId, persistence);
+			MqttConnectOptions connOpts = new MqttConnectOptions();
+			connOpts.setCleanSession(true);
+
+			System.out.println("checking");
+			System.out.println("Mqtt Connecting to broker: " + brokerUrl);
+
+			sampleClient.connect(connOpts);
+			System.out.println("Mqtt Connected");
+
+			sampleClient.setCallback(this);
+			sampleClient.subscribe(topic);
+
+			System.out.println("Subscribed");
+			System.out.println("Listening");
+
+		} catch (MqttException me) {
+			System.out.println(me);
+		}
+	}//end of subscribe_function
+
+	 //Called when the client lost the connection to the broker
+	public void connectionLost(Throwable arg0) {
+	}
+
+	//Called when a outgoing publish is complete
+	public void deliveryComplete(IMqttDeliveryToken arg0) {
+	}
+
+	//this function is called automatically when the message 
+	public void messageArrived(String topic, MqttMessage message) throws Exception {
+		
+		System.out.println("| Topic:" + topic);
+		System.out.println("| Message: " +message.toString());
+		System.out.println("-------------------------------------------------");
+		
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		
+		String myTopic="home1/room1";
+		new Subscriber().subscribe_function(myTopic);
+
+	}
+
+
+}
